@@ -1,0 +1,146 @@
+---
+  template: 
+    templateName: Alpha-JCS-DBCS-Template
+    templateVersion: 1.0.0
+    templateDescription: "Provisions a Stack composed of Java Cloud Service and Database Cloud Service instances using Oracle Storage Cloud Service."
+    parameters: 
+      wlVersion: 
+        label: JCS Version
+        description: "Select a JCS Version"
+        type: String
+        default: 12.2.1
+        allowedValues: [12.2.1, 12.1.3, 10.3.6]
+      wlComputeShape: 
+        label: Compute Shape
+        description: Select the Compute Shape for this service.
+        type: String
+        default: oc3
+        allowedValues: [ oc3, oc4, oc5, oc6, oc1m, oc2m, oc3m, oc4m ]
+      publicKeyText: 
+        label: SSH Public Key
+        description: Click Edit to generate a new key pair, enter an existing public keys value or upload a new public key.
+        type: ssh
+        default: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArn21PGy1SZ6AYFlztFUL1gv63EXMbSb4qo1SzPAwZgcQXjciU8YsettV81YIFzvIedEn4mhD8ebGKK1k8oYB7HYNsSywbXmqisI+75xY37EZT6ah+cxENmVxmzpOjOYH31wj792tf/WpUUpnN8MdIlTW8uAWNIa6Mz9YhAZ0sJILDOlSNr/rorrGYyYLBtJqbVAZlwEfUSgQTkMwBWK4L7aXOLMDFFAi2oEqsjmT3rWX55YzrwXIMvNXjslen6gXqrdoCeakKMbQ788fQqb1P9hgsmHhkERJfwhgFy+R1RUfPMHdZG7P2vNLUZDd54ROCmj2F852HkertpDMFNMWrQ== oracle@oraclelinux6.localdomain"
+        sensitive: true
+      wlAdminUser: 
+        label: Administrator Username
+        description: "Your choice of name for the JCS administration user. Must be between 8 and 128 ASCII characters and cannot contain a tab, brackets, parentheses or the characters , < > & # | ?"
+        type: String
+        minLength: 8
+        maxLength: 128
+        default: weblogic
+        allowedPattern: "[\\p{Print}&&[^',<>#&|\\?\\(\\)\\{\\}\t ]]++"
+      dbSid: 
+        label: DB Name (SID)
+        description: "Database name of your choice, up to 8 characters; must begin with a letter and can contain only letters and numbers."
+        type: String
+        minLength: 1
+        maxLength: 8
+        default: ORCL
+        allowedPattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+      dbVersion: 
+        label: DBCS Version
+        description: "Select a DBCS Version"
+        type: String
+        default: 12.1.0.2
+        allowedValues: [ 12.1.0.2, 11.2.0.4 ]
+      commonPwd: 
+        label: Password (to access JCS and DBCS)
+        description: "Password to access JCS and DBCS. Password must be between 8 and 30 characters with at least one lower case letter, one upper case letter, one number and one special character (_,#). For example, Ach1z0#d"
+        type: String
+        minLength: 8
+        maxLength: 30
+        allowedPattern: "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*[0-9])[a-zA-Z]([a-zA-Z0-9_#])+$"
+        mandatory: true
+        sensitive: true 
+      backupStorageContainer: 
+        label: Cloud Storage Container
+        description: "Name of the Exiting or new Oracle Storage Cloud Service container to be created for JCS and DBCS backup, recovery. The name has to be in the form https|http://<storagedomain>/{version}/<schema name>/<container name> or <storage service name>-<identity domain name>/<container name>. e.g:storagesvc999-usoracleaccoutrial00999/backupContainer. If given container does not exist a new container will be created."
+        type: String
+        default: Storage-gse00002055/AlphaBackup
+      cloudStorageUser: 
+        label: Cloud Storage Username
+        description: Enter  Ccloud storage container user name.
+        type: String
+        default: cloud.admin
+      cloudStoragePassword: 
+        label: Cloud Storage Password
+        description: Enter password for cloud storage container user.
+        type: String
+        default: passingPest@1
+      dbComputeShape:
+        label: Compute Shape
+        description: Select the Compute Shape for this service.
+        type: String
+        default: oc3
+        allowedValues: [ oc3, oc4, oc5, oc6, oc1m, oc2m, oc3m, oc4m ]
+      dbStorage: 
+        label: Usable Database Storage (GB)
+        description: "Enter the value for usable Database Storage in GB. The number must be between 15 and 1200."
+        type: Number
+        default: 25
+    parameterGroups:
+      - label: Backup and Recovery Configuration
+        parameters: [ backupStorageContainer, cloudStorageUser, cloudStoragePassword ]
+      - label: Stack Access
+        parameters: [ commonPwd, publicKeyText ]
+      - label: Oracle Database Cloud Service Details
+        parameters: [ dbVersion, dbComputeShape, dbSid, dbStorage ]
+      - label: Oracle Java Cloud Service Details
+        parameters: [ wlVersion, wlComputeShape, wlAdminUser ]
+    resources: 
+      backupContainer: 
+        type: OSS.Container
+        parameters: 
+          cloudStorageContainer: { "Fn::GetParam": backupStorageContainer }
+          cloudStorageUser: { "Fn::GetParam": cloudStorageUser }
+          cloudStoragePassword: { "Fn::GetParam": cloudStoragePassword }
+      jcs: 
+        type: jaas
+        parameters: 
+          serviceName: { "Fn::Join": ["", ["Fn::GetParam": serviceName, -JCS]] }
+          cloudStorageContainer: { "Fn::GetParam": backupStorageContainer }
+          cloudStorageUser: { "Fn::GetParam": cloudStorageUser }
+          cloudStoragePassword: {"Fn::GetParam": cloudStoragePassword }
+          parameters: 
+            - 
+              VMsPublicKey: { "Fn::GetParam": publicKeyText }
+              adminUserName: { "Fn::GetParam": wlAdminUser }
+              adminPassword: { "Fn::GetParam": commonPwd }
+              dbServiceName: { "Fn::GetAtt": [dbcs, serviceName] }
+              dbaName: sys
+              dbaPassword: { "Fn::GetParam": commonPwd }
+              shape: { "Fn::GetParam": wlComputeShape }
+              type: weblogic
+              version: { "Fn::GetParam": wlVersion }
+        depends_on: 
+          - backupContainer
+      dbcs: 
+        type: dbaas
+        parameters: 
+          serviceName: { "Fn::Join": ["", ["Fn::GetParam": serviceName, -DBCS]] }
+          version: { "Fn::GetParam": dbVersion }
+          level: PAAS
+          edition: EE 
+          shape: { "Fn::GetParam": dbComputeShape }
+          vmPublicKeyText: { "Fn::GetParam": publicKeyText }
+          parameters: 
+            - 
+              type: db
+              adminPassword: { "Fn::GetParam": commonPwd }
+              sid: { "Fn::GetParam": dbSid }
+              failoverDatabase: no
+              backupDestination: BOTH
+              timezone: UTC
+              charset: AL32UTF8
+              ncharset: AL16UTF16
+              cloudStorageContainer: { "Fn::GetParam": backupStorageContainer }
+              cloudStorageUser: { "Fn::GetParam": cloudStorageUser }
+              cloudStoragePwd: { "Fn::GetParam": cloudStoragePassword }
+              usableStorage: { "Fn::GetParam": dbStorage }
+        depends_on: 
+          - backupContainer
+    attributes: 
+        OraConnectString: 
+            value: { "Fn::GetAtt": [dbcs, components.DB_1.attributes.CONNECT_DESCRIPTOR] }
+            description: DBCS connect descriptor
