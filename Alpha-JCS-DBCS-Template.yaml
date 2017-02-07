@@ -1,7 +1,7 @@
 ---
   template: 
     templateName: Alpha-JCS-DBCS-Template
-    templateVersion: 1.0.0
+    templateVersion: 1.0.4
     templateDescription: "Provisions a Stack composed of Java Cloud Service and Database Cloud Service instances using Oracle Storage Cloud Service."
     parameters: 
       wlVersion: 
