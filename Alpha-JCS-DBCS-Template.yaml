@@ -1,7 +1,7 @@
 ---
   template: 
     templateName: Alpha-JCS-DBCS-Template
-    templateVersion: 1.0.4
+    templateVersion: 1.0.0
     templateDescription: "Provisions a Stack composed of Java Cloud Service and Database Cloud Service instances using Oracle Storage Cloud Service."
     parameters: 
       wlVersion: 
@@ -99,6 +99,7 @@
         type: jaas
         parameters: 
           serviceName: { "Fn::Join": ["", ["Fn::GetParam": serviceName, -JCS]] }
+          enableAdminConsole: true
           cloudStorageContainer: { "Fn::GetParam": backupStorageContainer }
           cloudStorageUser: { "Fn::GetParam": cloudStorageUser }
           cloudStoragePassword: {"Fn::GetParam": cloudStoragePassword }
@@ -110,6 +111,11 @@
               dbServiceName: { "Fn::GetAtt": [dbcs, serviceName] }
               dbaName: sys
               dbaPassword: { "Fn::GetParam": commonPwd }
+              appDBs:
+                -
+                  dbServiceName: { "Fn::Join": ["", ["Fn::GetParam": serviceName, -DBCS]] }
+                  dbaName: alpha
+                  dbaPassword": oracle
               shape: { "Fn::GetParam": wlComputeShape }
               type: weblogic
               version: { "Fn::GetParam": wlVersion }
