@@ -111,11 +111,6 @@
               dbServiceName: { "Fn::GetAtt": [dbcs, serviceName] }
               dbaName: sys
               dbaPassword: { "Fn::GetParam": commonPwd }
-              appDBs:
-                -
-                  dbServiceName: { "Fn::Join": ["", ["Fn::GetParam": serviceName, -DBCS]] }
-                  dbaName: alpha
-                  dbaPassword": oracle
               shape: { "Fn::GetParam": wlComputeShape }
               type: weblogic
               version: { "Fn::GetParam": wlVersion }
