@@ -19,4 +19,7 @@ num=$(echo $response|grep -b -o "em_url"|awk -F":" '{print $1}')
 
 INPUT=${response:$num+20}
 PUBLIC_IP=${INPUT%%:*}
-echo "Public IP = $PUBLIC_IP"
+#
+ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} sqlplus system/Alpha2014_@PDB1 < createAlphaUser.sql
+#
+ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} sqlplus alpha/oracle@PDB1 < createProducts.sql
