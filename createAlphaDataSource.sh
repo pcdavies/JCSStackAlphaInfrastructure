@@ -12,18 +12,22 @@ OPC_PASSWORD=$3
 response=$(curl --request GET \
                 --user "${OPC_USERNAME}:${OPC_PASSWORD}" \
                 --header "X-ID-TENANT-NAME: ${OPC_DOMAIN}" \
-                --url https://dbcs.emea.oraclecloud.com/jaas/db/api/v1.1/instances/${OPC_DOMAIN}/${ServiceName}-DBCS | sed 's/ /_/g')
+                --url https://jcs.emea.oraclecloud.com/jaas/api/v1.1/instances/${OPC_DOMAIN}/${ServiceName}-JCS | sed 's/ /_/g')
+echo "Response = $response"
 
 # find position of EM URL in string
-num=$(echo $response|grep -b -o "em_url"|awk -F":" '{print $1}')
+num=$(echo $response|grep -b -o "wls_admin_ur"|awk -F":" '{print $1}')
 
-INPUT=${response:$num+20}
+INPUT=${response:$num+27}
+echo "Input = $INPUT"
 PUBLIC_IP=${INPUT%%:*}
+echo "PublicIP = $PUBLIC_IP"
 #
-ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} sqlplus system/Alpha2014_@PDB1 < createAlphaUser.sql
+scp -o "StrictHostKeyChecking no" -i ./labkey ./labkey.pub opc@${PUBLIC_IP}:/home/opc/.
+scp -o "StrictHostKeyChecking no" -i ./labkey ./setupJCS.sh opc@${PUBLIC_IP}:/home/opc/.
+ssh -t -t -o "StrictHostKeyChecking no" -i ./labkey opc@${PUBLIC_IP} "sudo /home/opc/setupJCS.sh"
 #
-ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} sqlplus alpha/oracle@PDB1 < createProducts.sql
-
-
-. $DOMAIN_HOME/bin/setDomainEnv.sh
-java weblogic.WLST create_data_source.py -p Alpha-ds.properties
+scp -o "StrictHostKeyChecking no" -i ./labkey runAlphaDS.sh oracle@${PUBLIC_IP}:~oracle/.
+scp -o "StrictHostKeyChecking no" -i ./labkey create_data_source.py oracle@${PUBLIC_IP}:~oracle/.
+scp -o "StrictHostKeyChecking no" -i ./labkey Alpha-ds.properties oracle@${PUBLIC_IP}:~oracle/.
+ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} "/u01/app/oracle/tools/paas/state/homes/oracle/runAlphaDS.hs"

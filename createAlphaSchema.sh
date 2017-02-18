@@ -2,7 +2,7 @@
 ##
 if [ $# -lt 3 ]
 then
-    echo "Usage: getDBCSPublicIP <OPC Identity Domain> <OPC Username> <OPC Password>"
+    echo "Usage: createAlphaSchema.sh <OPC Identity Domain> <OPC Username> <OPC Password>"
     exit 1
 fi
 OPC_DOMAIN=$1
