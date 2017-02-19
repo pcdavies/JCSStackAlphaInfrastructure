@@ -30,4 +30,4 @@ ssh -t -t -o "StrictHostKeyChecking no" -i ./labkey opc@${PUBLIC_IP} "sudo /home
 scp -o "StrictHostKeyChecking no" -i ./labkey runAlphaDS.sh oracle@${PUBLIC_IP}:~oracle/.
 scp -o "StrictHostKeyChecking no" -i ./labkey create_data_source.py oracle@${PUBLIC_IP}:~oracle/.
 scp -o "StrictHostKeyChecking no" -i ./labkey Alpha-ds.properties oracle@${PUBLIC_IP}:~oracle/.
-ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} "/u01/app/oracle/tools/paas/state/homes/oracle/runAlphaDS.hs"
+ssh -o "StrictHostKeyChecking no" -i ./labkey oracle@${PUBLIC_IP} "/u01/app/oracle/tools/paas/state/homes/oracle/runAlphaDS.sh"
