@@ -16,7 +16,7 @@ job=$(curl --request POST \
      --header "content-type: multipart/form-data" \
      --form name=$ServiceName \
      --form template=Alpha-JCS-DBCS-Template \
-     --form 'parameterValues={"commonPwd":"'"$CommonPassword"'", "backupStorageContainer":"'"$BackupStorageContainer"'", "cloudStoragePassword":"passingPest@1"}}')
+     --form 'parameterValues={"commonPwd":"'"$CommonPassword"'", "backupStorageContainer":"'"$BackupStorageContainer"'", "cloudStoragePassword":"${OPC_PASSWORD}"}}')
 
 #
 #
