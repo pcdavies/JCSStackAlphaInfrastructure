@@ -20,7 +20,7 @@
         label: SSH Public Key
         description: Click Edit to generate a new key pair, enter an existing public keys value or upload a new public key.
         type: ssh
-        default: ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEArn21PGy1SZ6AYFlztFUL1gv63EXMbSb4qo1SzPAwZgcQXjciU8YsettV81YIFzvIedEn4mhD8ebGKK1k8oYB7HYNsSywbXmqisI+75xY37EZT6ah+cxENmVxmzpOjOYH31wj792tf/WpUUpnN8MdIlTW8uAWNIa6Mz9YhAZ0sJILDOlSNr/rorrGYyYLBtJqbVAZlwEfUSgQTkMwBWK4L7aXOLMDFFAi2oEqsjmT3rWX55YzrwXIMvNXjslen6gXqrdoCeakKMbQ788fQqb1P9hgsmHhkERJfwhgFy+R1RUfPMHdZG7P2vNLUZDd54ROCmj2F852HkertpDMFNMWrQ== oracle@oraclelinux6.localdomain"
+        mandatory: true
         sensitive: true
       wlAdminUser: 
         label: Administrator Username
@@ -53,21 +53,18 @@
         allowedPattern: "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*[0-9])[a-zA-Z]([a-zA-Z0-9_#])+$"
         mandatory: true
         sensitive: true 
-      backupStorageContainer: 
+      backupStorageContainer:
         label: Cloud Storage Container
-        description: "Name of the Exiting or new Oracle Storage Cloud Service container to be created for JCS and DBCS backup, recovery. The name has to be in the form https|http://<storagedomain>/{version}/<schema name>/<container name> or <storage service name>-<identity domain name>/<container name>. e.g:storagesvc999-usoracleaccoutrial00999/backupContainer. If given container does not exist a new container will be created."
+        description: https://foo.storage.oraclecloud.com/MyService-bar/MyContainer. To identify the URL of your storage account, see the <a href="http://docs.oracle.com/en/cloud/iaas/storage-cloud/cssto/accessing-oracle-storage-cloud-service.html#CSSTO-GUID-221133EF-F408-4DCF-9BF7-7A1F12C3E8A6"> documentation</a>.
         type: String
-        default: Storage-gse00002055/AlphaBackup
       cloudStorageUser: 
         label: Cloud Storage Username
-        description: Enter  Ccloud storage container user name.
+        description: Enter  Cloud storage container user name.
         type: String
-        default: cloud.admin
       cloudStoragePassword: 
         label: Cloud Storage Password
         description: Enter password for cloud storage container user.
         type: String
-        default: passingPest@1
       dbComputeShape:
         label: Compute Shape
         description: Select the Compute Shape for this service.
